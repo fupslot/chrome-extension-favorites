@@ -1,6 +1,6 @@
 let remoteIndexId = localStorage.getItem('bookmarks');
 const localIndex = { keys: {} };
-const ACCESS_TOKEN = '7c19360c8b884ecb9db55587723211c4475184b0';
+const ACCESS_TOKEN = localStorage.getItem('access_token');
 const GITHUB_API = 'https://api.github.com';
 const EMPTY = '{}';
 
@@ -108,8 +108,14 @@ function readRemoteIndex() {
 
 
 function initialize() {
+  if (!ACCESS_TOKEN || ACCESS_TOKEN === '') {
+    console.warn('Cannot sync favorites. No access token!');
+    return
+  }
+
   if (localStorage.getItem('bookmarks')) {
     return readRemoteIndex();
   }
+
   return createRemoteIndex().then(readRemoteIndex);
 }
