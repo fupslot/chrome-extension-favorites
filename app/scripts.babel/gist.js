@@ -42,7 +42,7 @@ function updateRemoteIndex() {
 
   const body = {
     files: {
-      'bookmarks': {
+      'chromeExtensionBookmarks': {
         content: JSON.stringify(localIndex.keys)
       }
     }
@@ -76,7 +76,7 @@ function createRemoteIndex() {
     description: 'Bookmarks',
     public: true,
     files: {
-      'bookmarks': { content: EMPTY }
+      'chromeExtensionBookmarks': { content: EMPTY }
     }
   };
 
@@ -102,20 +102,40 @@ function readRemoteIndex() {
   return fetch(request)
     .then(response => response.json())
     .then(data => {
-      rebuildLocalIndex(data.files.bookmarks.content);
+      rebuildLocalIndex(data.files.chromeExtensionBookmarks.content);
     });
 }
 
+function findRemoteIndex() {
+  const URL = new GithubURL('/gists');
+  const request = new Request(URL);
+  return fetch(request)
+    .then(response => response.json())
+    .then(data => {
+      return data.some(record => {
+        if (record.files.chromeExtensionBookmarks) {
+          localStorage.setItem('bookmarks', record.id);
+          remoteIndexId = record.id;
+          return true;
+        }
+        return false;
+      })
+    });
+}
 
 function initialize() {
-  if (!ACCESS_TOKEN || ACCESS_TOKEN === '') {
-    console.warn('Cannot sync favorites. No access token!');
-    return
+  if (!ACCESS_TOKEN) {
+    return Promise.reject({error: 'token'});
   }
 
   if (localStorage.getItem('bookmarks')) {
     return readRemoteIndex();
   }
-
-  return createRemoteIndex().then(readRemoteIndex);
+  else {
+    return findRemoteIndex().then(found => {
+      return found === true
+        ? readRemoteIndex()
+        : createRemoteIndex().then(readRemoteIndex);
+    });
+  }
 }

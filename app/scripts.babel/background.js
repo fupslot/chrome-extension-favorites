@@ -21,7 +21,17 @@ function onBookmarkRemoved(id, bookmark) {
 }
 
 
-initialize().then(function () {
-  chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
-  chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
-})
+initialize()
+  .then(function () {
+    chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
+    chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
+  })
+  .catch(function (data) {
+    if (data.error === 'token') {
+      console.warn('Cannot sync favorites. No access token!');
+    }
+    else {
+      console.log('Oops!');
+    }
+  })
+;
