@@ -24,13 +24,11 @@ function appendBookmarkToLocalIndex(bookmark) {
     title: bookmark.title,
     url: bookmark.url
   };
-  console.log('Local Index was updated');
 }
 
 
 function removeBookmarkFromLocalIndex(bookmark) {
   delete localIndex.keys[bookmark.id];
-  console.log('Local Index was updated');
 }
 
 
@@ -57,15 +55,7 @@ function updateRemoteIndex() {
   return fetch(request);
 }
 
-function createBookmark(bookmark) {
-  appendBookmarkToLocalIndex(bookmark);
-  return updateRemoteIndex();
-}
 
-function removeBookmark(bookmark) {
-  removeBookmarkFromLocalIndex(bookmark);
-  return updateRemoteIndex();
-}
 
 function createRemoteIndex() {
   const URL = new GithubURL('/gists');
@@ -123,19 +113,21 @@ function findRemoteIndex() {
     });
 }
 
-function initialize() {
-  if (!ACCESS_TOKEN) {
-    return Promise.reject({error: 'token'});
-  }
+function createBookmark(bookmark) {
+  appendBookmarkToLocalIndex(bookmark);
+  return updateRemoteIndex();
+}
 
-  if (localStorage.getItem('bookmarks')) {
-    return readRemoteIndex();
+function removeBookmark(bookmark) {
+  removeBookmarkFromLocalIndex(bookmark);
+  return updateRemoteIndex();
+}
+
+function changeBookmark(data) {
+  if (data.url) {
+    localDB.changeBookmark(new Bookmark(data));
   }
   else {
-    return findRemoteIndex().then(found => {
-      return found === true
-        ? readRemoteIndex()
-        : createRemoteIndex().then(readRemoteIndex);
-    });
+    localDB.changeTag(new Tag(data));
   }
 }

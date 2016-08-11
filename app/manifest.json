@@ -10,9 +10,13 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "scripts/pubsub.js",
+      "scripts/commons.js",
+      "scripts/localDB.js",
+      "scripts/bookmarksTraversal.js",
       "scripts/gist.js",
       "scripts/chromereload.js",
-      "scripts/background.js"
+      "scripts/main.js"
     ]
   },
   "permissions": [
