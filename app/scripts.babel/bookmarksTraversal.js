@@ -5,11 +5,11 @@ function bookmarksTraversal(item, db) {
     for (var i = 0; i < item.children.length; i++) {
       let child = item.children[i];
       if (child.children) {
-        db.addTag(new Tag(child));
+        db.addTag(new Tag(child), {silent: true});
         bookmarksTraversal(child, db);
       } else {
         // bookmark
-        db.addBookmark(new Bookmark(child));
+        db.addBookmark(new Bookmark(child), {silent: true});
       }
     }
   } else {

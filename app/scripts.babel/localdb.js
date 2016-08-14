@@ -32,9 +32,9 @@ const localDB = (function () {
     return index;
   };
 
-  LocalDB.prototype.addTag = function (newTag) {
+  LocalDB.prototype.addTag = function (newTag, {silent}) {
     this.data.tags.push(newTag);
-    this.emit('add', newTag);
+    if (silent) this.emit('add', newTag);
   };
 
   LocalDB.prototype.changeTag = function (changeTag) {
@@ -56,9 +56,9 @@ const localDB = (function () {
   };
 
 
-  LocalDB.prototype.addBookmark = function (newBookmark) {
+  LocalDB.prototype.addBookmark = function (newBookmark, {silent}) {
     this.data.bookmarks.push(newBookmark);
-    this.emit('add', newBookmark);
+    if (silent) this.emit('add', newBookmark);
   };
 
 
