@@ -1,5 +1,14 @@
 'use strict';
 
+function changeItem(data) {
+  if (data.url) {
+    localDB.changeBookmark(new Bookmark(data));
+  }
+  else {
+    localDB.changeTag(new Tag(data));
+  }
+}
+
 function onBookmarkCreated(id, bookmark) {
   console.log('A bookmark is created');
   console.log(`${id}`, bookmark);
@@ -16,8 +25,8 @@ function onBookmarkRemoved(id, bookmark) {
   }
 }
 
-function onBookmarkChanged(id, bookmark) {
-  changeBookmark(Object.assign({}, {id}, bookmark));
+function onItemChanged(id, item) {
+  changeItem(Object.assign({}, {id}, item));
 }
 
 function initialize() {
@@ -44,9 +53,9 @@ chrome.runtime.onInstalled.addListener(details => {
       .then(function () {
         // chrome.bookmarks.onCreated.addListener(onBookmarkCreated);
         // chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
-        chrome.bookmarks.onChanged.addListener(onBookmarkChanged);
+        chrome.bookmarks.onChanged.addListener(onItemChanged);
       })
-      .then(() => console.log('favorite initialized'))
+      .then(( ) => console.log('favorite initialized'))
       .catch(function (data) {
         if (data.error === 'token') {
           console.warn('Cannot sync favorites. No access token!');

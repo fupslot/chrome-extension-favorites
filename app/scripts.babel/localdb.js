@@ -5,54 +5,91 @@ const localDB = (function () {
     PubSub.call(this);
   }
 
+  // Should apply
   LocalDB.prototype.find = function (collection, entity) {
     let item = null;
+
     for (var i = 0; i < collection.length; i++) {
       if (collection[i].id === entity.id) {
         item = collection[i];
         break;
       }
     }
+
     return item;
   };
 
-  LocalDB.prototype.addTag = function (tag) {
-    this.data.tags.push(tag);
+  LocalDB.prototype.findIndex = function (collection, id) {
+    let index = -1;
+
+    for (var i = 0; i < collection.length; i++) {
+      if (collection[i].id === id) {
+        index = i;
+        break;
+      }
+    }
+
+    return index;
+  };
+
+  LocalDB.prototype.addTag = function (newTag) {
+    this.data.tags.push(newTag);
+    this.emit('add', newTag);
   };
 
   LocalDB.prototype.changeTag = function (changeTag) {
-    let localTag = this.find(this.data.tags, changeTag);
-    if (!localTag) return;
-    localTag.value = changeTag.value;
-    this.emit('change', changeTag);
+    let localTagIndex = this.findIndex(this.data.tags, changeTag.id);
+    if (localTagIndex !== -1) {
+      let localTag = this.data.tags[localTagIndex];
+      localTag.value = changeTag.value;
+      this.emit('change', localTag);
+    }
   };
 
   LocalDB.prototype.removeTag = function (tag) {
-    console.log('Not implemented yet!');
+    let tagIndex = this.findIndex(this.data.tags, tag.id);
+    if (tagIndex !== -1) {
+      let tag = this.data.tags[tagIndex];
+      this.data.tags.splice(tagIndex, 1);
+      this.emit('remove', tag);
+    }
   };
 
 
-  LocalDB.prototype.addBookmark = function (bookmark) {
-    this.data.bookmarks.push(bookmark);
+  LocalDB.prototype.addBookmark = function (newBookmark) {
+    this.data.bookmarks.push(newBookmark);
+    this.emit('add', newBookmark);
   };
 
 
-  LocalDB.prototype.changeBookmark = function (bookmark) {
-    console.log('Not implemented yet!');
+  LocalDB.prototype.changeBookmark = function (changeBookmark) {
+    let bookmarkIndex = this.findIndex(this.data.bookmarks, changeBookmark.id);
+    if (bookmarkIndex !== -1) {
+      let bookmark = this.data.bookmarks[bookmarkIndex];
+      bookmark.title = changeBookmark.title;
+      bookmark.url = changeBookmark.url;
+      this.emit('change', bookmark);
+    }
   };
 
 
   LocalDB.prototype.removeBookmark = function (bookmark) {
-    console.log('Not implemented yet!');
+    let bookmarkIndex = this.findIndex(this.data.bookmarks, bookmark.id);
+    if (bookmarkIndex !== -1) {
+      let bookmark = this.data.bookmarks[bookmarkIndex];
+      this.data.bookmarks.splice(bookmarkIndex, 1);
+      this.emit('remove', bookmark);
+    }
   };
+
 
   return new LocalDB();
 }());
 
-function DBWatcher(db) {
-  db.on('change', function(changeTag) {
-    console.log(changeTag);
-  });
+function DBWatcher(localDB) {
+  localDB.on('change', (changeItem) => console.log('change', changeItem));
+  localDB.on('add', (newItem) => console.log('add', newItem));
+  localDB.on('remove', (removeItem) => console.log('remove', removeItem));
 }
 
 // should watch changes within DB

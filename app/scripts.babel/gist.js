@@ -122,12 +122,3 @@ function removeBookmark(bookmark) {
   removeBookmarkFromLocalIndex(bookmark);
   return updateRemoteIndex();
 }
-
-function changeBookmark(data) {
-  if (data.url) {
-    localDB.changeBookmark(new Bookmark(data));
-  }
-  else {
-    localDB.changeTag(new Tag(data));
-  }
-}
